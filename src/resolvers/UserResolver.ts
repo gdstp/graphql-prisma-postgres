@@ -10,6 +10,11 @@ class UserResolver {
     return ctx.prisma.user.findMany();
   }
 
+  @Query((returns) => User)
+  async findUser(@Ctx() ctx: Context) {
+    return ctx.prisma.user.findFirst();
+  }
+
   @Mutation((returns) => User, { name: 'createUser' })
   async create(
     @Arg('username') username: string,
