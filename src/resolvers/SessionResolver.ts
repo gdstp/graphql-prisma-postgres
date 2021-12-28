@@ -2,9 +2,11 @@ import { Arg, Ctx, Query, Resolver } from 'type-graphql';
 import { Context } from '../context';
 import User from '../schemas/User';
 import * as bcrypt from 'bcryptjs';
+import * as jwt from 'jsonwebtoken';
+import auth from '../config/auth';
 
 @Resolver(User)
-class SessionController {
+class SessionResolver {
   @Query((returns) => String)
   async login(
     @Arg('username') username: string,
@@ -21,8 +23,13 @@ class SessionController {
       throw new Error('Incorrect credentials');
     }
 
-    return 'ok';
+    const token = jwt.sign({}, auth.jwt.secret, {
+      subject: user.name,
+      expiresIn: auth.jwt.expiresIn,
+    });
+
+    return token;
   }
 }
 
-export default SessionController;
+export default SessionResolver;
