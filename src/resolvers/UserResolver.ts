@@ -1,7 +1,7 @@
 import { Arg, Ctx, Mutation, Query, Resolver } from 'type-graphql';
 import { Context } from '../context';
 import User from '../schemas/User';
-import * as bcrypt from 'bcryptjs';
+import Encrypter from '../libs/encrypter';
 
 @Resolver(User)
 class UserResolver {
@@ -22,7 +22,7 @@ class UserResolver {
     @Arg('name') name: string,
     @Ctx() { prisma }: Context
   ) {
-    const hashedPassword = await bcrypt.hash(password, 8);
+    const hashedPassword = await Encrypter.Hash(password);
     return await prisma.user.create({
       data: { username, name, password: hashedPassword },
     });
