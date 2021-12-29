@@ -17,6 +17,7 @@ const AuthMiddleware: AuthChecker<Context> = ({ context }): boolean => {
 
     return !!decoded;
   } catch (error) {
+    console.log(error);
     return false;
   }
 };

@@ -17,4 +17,15 @@ model User {
   name      String
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+  Tweet     Tweet[]
+}
+
+model Tweet {
+  id          Int      @id @default(autoincrement())
+  description String
+  user        User     @relation(fields: [userId], references: [id])
+  userId      Int
+  likes       Int
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 }
