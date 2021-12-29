@@ -22,7 +22,7 @@ class SessionResolver {
       throw new Error('Incorrect credentials');
     }
 
-    const token = JWT.Sign(user.name);
+    const token = JWT.Sign(user.id);
 
     return token;
   }

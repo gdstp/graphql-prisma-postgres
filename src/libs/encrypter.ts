@@ -2,7 +2,7 @@ import * as bcrypt from 'bcryptjs';
 
 class Encrypter {
   async Compare(hashedPassword: string, password: string): Promise<boolean> {
-    return await bcrypt.compare(password, hashedPassword);
+    return await bcrypt.compare(hashedPassword, password);
   }
 
   async Hash(password: string): Promise<string> {
