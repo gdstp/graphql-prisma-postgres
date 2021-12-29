@@ -1,8 +1,7 @@
-import { Arg, Args, Ctx, Mutation, Query, Resolver } from 'type-graphql';
-import { Context } from '../context';
+import { Arg, Ctx, Mutation, Query, Resolver } from 'type-graphql';
+import { Context } from '../types';
 import User from '../schemas/User';
 import Encrypter from '../libs/encrypter';
-import JWT from '../libs/jsonwebtoken';
 
 @Resolver(User)
 class UserResolver {
@@ -12,8 +11,7 @@ class UserResolver {
   }
 
   @Query((returns) => User)
-  async findUser(@Ctx() { prisma, token }: Context) {
-    const userId = await JWT.Decode(token);
+  async findUser(@Ctx() { prisma, userId }: Context) {
     return prisma.user.findFirst({ where: { id: userId } });
   }
 

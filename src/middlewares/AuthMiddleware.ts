@@ -1,7 +1,7 @@
 import { AuthChecker } from 'type-graphql';
 import { verify } from 'jsonwebtoken';
 import auth from '../config/auth';
-import { Context } from '../context';
+import { Context } from '../types';
 
 const AuthMiddleware: AuthChecker<Context> = ({ context }): boolean => {
   const authHeader = context.token;

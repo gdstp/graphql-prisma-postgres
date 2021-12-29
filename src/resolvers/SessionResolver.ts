@@ -1,5 +1,5 @@
 import { Arg, Ctx, Query, Resolver } from 'type-graphql';
-import { Context } from '../context';
+import { Context } from '../types';
 import User from '../schemas/User';
 import Encrypter from '../libs/encrypter';
 import JWT from '../libs/jsonwebtoken';

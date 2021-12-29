@@ -11,9 +11,16 @@ class JWT {
   }
 
   async Decode(rawToken: string) {
-    const [_, token] = rawToken.split(' ');
-    const decoded = jwt.decode(token);
-    return parseInt(decoded.sub as string);
+    if (!rawToken) {
+      return null;
+    }
+    try {
+      const [_, token] = rawToken.split(' ');
+      const decoded = jwt.decode(token);
+      return parseInt(decoded.sub as string);
+    } catch (error) {
+      return null;
+    }
   }
 }
 

@@ -1,22 +1,22 @@
 import { Arg, Authorized, Ctx, Mutation, Query, Resolver } from 'type-graphql';
-import { Context } from '../context';
+import { Context } from '../types';
 import Tweet from '../schemas/Tweet';
 import JWT from '../libs/jsonwebtoken';
 
 @Resolver(Tweet)
 class TweetResolver {
   @Query((returns) => [Tweet], { name: 'findAllTweets' })
-  async findAll(@Ctx() { prisma }: Context) {
+  async findAll(@Ctx() { prisma, userId }: Context) {
+    console.log(userId);
     return await prisma.tweet.findMany();
   }
 
   @Mutation((returns) => Tweet, { name: 'createTweet' })
   @Authorized()
   async create(
-    @Ctx() { prisma, token }: Context,
+    @Ctx() { prisma, userId }: Context,
     @Arg('description') description: string
   ) {
-    const userId = await JWT.Decode(token);
     const user = await prisma.user.findUnique({ where: { id: userId } });
     if (!user) {
       throw new Error('User not found');
@@ -30,11 +30,10 @@ class TweetResolver {
   @Mutation((returns) => Tweet, { name: 'updateTweet' })
   @Authorized()
   async update(
-    @Ctx() { prisma, token }: Context,
+    @Ctx() { prisma, userId }: Context,
     @Arg('description') description: string,
     @Arg('tweetId') tweetId: number
   ) {
-    const userId = await JWT.Decode(token);
     const tweet = await prisma.tweet.findFirst({
       where: { id: tweetId, userId },
     });
@@ -46,6 +45,22 @@ class TweetResolver {
       data: { description },
     });
     return updatedTweet;
+  }
+
+  @Mutation((returns) => Tweet, { name: 'deleteTweet' })
+  @Authorized()
+  async delete(
+    @Ctx() { prisma, userId }: Context,
+    @Arg('tweetId') tweetId: number
+  ) {
+    const tweet = await prisma.tweet.findFirst({
+      where: { id: tweetId, userId },
+    });
+    if (!tweet) {
+      throw new Error('Tweet does not exists');
+    }
+    await prisma.tweet.delete({ where: { id: tweetId } });
+    return tweet;
   }
 }
 
