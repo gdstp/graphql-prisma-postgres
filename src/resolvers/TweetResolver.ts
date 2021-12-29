@@ -26,6 +26,27 @@ class TweetResolver {
     });
     return { ...tweet, user };
   }
+
+  @Mutation((returns) => Tweet, { name: 'updateTweet' })
+  @Authorized()
+  async update(
+    @Ctx() { prisma, token }: Context,
+    @Arg('description') description: string,
+    @Arg('tweetId') tweetId: number
+  ) {
+    const userId = await JWT.Decode(token);
+    const tweet = await prisma.tweet.findFirst({
+      where: { id: tweetId, userId },
+    });
+    if (!tweet) {
+      throw new Error('Tweet does not exists');
+    }
+    const updatedTweet = await prisma.tweet.update({
+      where: { id: tweetId },
+      data: { description },
+    });
+    return updatedTweet;
+  }
 }
 
 export default TweetResolver;
