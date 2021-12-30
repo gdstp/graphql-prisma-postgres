@@ -1,7 +1,6 @@
 import { Arg, Authorized, Ctx, Mutation, Query, Resolver } from 'type-graphql';
 import { Context } from '../types';
 import Tweet from '../schemas/Tweet';
-import JWT from '../libs/jsonwebtoken';
 
 @Resolver(Tweet)
 class TweetResolver {
@@ -61,6 +60,50 @@ class TweetResolver {
     }
     await prisma.tweet.delete({ where: { id: tweetId } });
     return tweet;
+  }
+
+  @Mutation((returns) => Tweet, { name: 'upvoteTweet' })
+  @Authorized()
+  async upvote(
+    @Ctx() { prisma, userId }: Context,
+    @Arg('tweetId') tweetId: number
+  ) {
+    const tweet = await prisma.tweet.findUnique({ where: { id: tweetId } });
+    if (!tweet) {
+      throw new Error('Tweet does not exists');
+    }
+    if (tweet.userId === userId) {
+      throw new Error('Cannot upvote own tweet');
+    }
+
+    const updatedTweet = await prisma.tweet.update({
+      where: { id: tweetId },
+      data: { likes: tweet.likes + 1 },
+    });
+
+    return updatedTweet;
+  }
+
+  @Mutation((returns) => Tweet, { name: 'downvoteTweet' })
+  @Authorized()
+  async downvote(
+    @Ctx() { prisma, userId }: Context,
+    @Arg('tweetId') tweetId: number
+  ) {
+    const tweet = await prisma.tweet.findUnique({ where: { id: tweetId } });
+    if (!tweet) {
+      throw new Error('Tweet does not exists');
+    }
+    if (tweet.userId === userId) {
+      throw new Error('Cannot downvote own tweet');
+    }
+
+    const updatedTweet = await prisma.tweet.update({
+      where: { id: tweetId },
+      data: { likes: tweet.likes - 1 },
+    });
+
+    return updatedTweet;
   }
 }
 
